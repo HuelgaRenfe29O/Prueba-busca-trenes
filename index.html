@@ -6,6 +6,7 @@
 <title>Consulta circulación de trenes afectados por la huelga</title>
 
 <style>
+
 *{
     margin:0;
     padding:0;
@@ -19,8 +20,8 @@ body{
 }
 
 .cabecera{
-    max-width:1200px;
-    margin:auto auto 25px auto;
+    max-width:1400px;
+    margin:0 auto 25px auto;
     background:linear-gradient(
         90deg,
         #7a0a60 0%,
@@ -31,6 +32,7 @@ body{
     );
     border-radius:20px;
     padding:20px 30px;
+    box-shadow:0 10px 25px rgba(0,0,0,.25);
 }
 
 .cabecera-contenido{
@@ -41,6 +43,7 @@ body{
 
 .logo-renfe{
     width:90px;
+    height:auto;
 }
 
 .titulo h1{
@@ -51,16 +54,19 @@ body{
 
 .titulo h2{
     color:white;
-    font-weight:300;
     font-size:22px;
+    font-weight:300;
+    margin-top:6px;
 }
 
 .card{
-    max-width:1200px;
+    width:100%;
+    max-width:1400px;
     margin:auto;
     background:white;
     border-radius:20px;
     padding:30px;
+    box-shadow:0 10px 25px rgba(0,0,0,.20);
 }
 
 .buscador{
@@ -79,8 +85,9 @@ body{
 
 .buscador h3{
     color:white;
-    margin-bottom:15px;
     text-align:center;
+    margin-bottom:15px;
+    font-size:26px;
 }
 
 input,select{
@@ -105,9 +112,13 @@ input,select{
     border-radius:10px;
     background:#c00060;
     color:white;
-    cursor:pointer;
     font-size:16px;
     font-weight:bold;
+    cursor:pointer;
+}
+
+.btn:hover{
+    background:#a00050;
 }
 
 .ficha{
@@ -117,14 +128,37 @@ input,select{
     margin-bottom:20px;
 }
 
+table{
+    width:100%;
+    border-collapse:collapse;
+    table-layout:auto;
+}
+
+th{
+    background:#c00060;
+    color:white;
+    padding:10px;
+    text-align:center;
+}
+
+td{
+    padding:10px;
+    border-bottom:1px solid #ddd;
+    text-align:center;
+}
+
+tr:hover{
+    background:#f2f2f2;
+}
+
 .estado{
     margin-top:15px;
     padding:18px;
-    text-align:center;
+    border-radius:12px;
     color:white;
+    text-align:center;
     font-size:30px;
     font-weight:bold;
-    border-radius:10px;
 }
 
 .verde{
@@ -143,27 +177,6 @@ input,select{
     border-radius:8px;
 }
 
-table{
-    width:100%;
-    border-collapse:collapse;
-}
-
-th{
-    background:#c00060;
-    color:white;
-    padding:10px;
-}
-
-td{
-    padding:10px;
-    border-bottom:1px solid #ddd;
-    text-align:center;
-}
-
-tr:hover{
-    background:#f3f3f3;
-}
-
 .separador{
     margin:40px 0;
 }
@@ -172,31 +185,75 @@ footer{
     text-align:center;
     color:white;
     margin-top:20px;
+    font-size:13px;
 }
 
 @media(max-width:768px){
 
-    .logo-renfe{
-        width:60px;
-    }
-
-    .titulo h1{
-        font-size:36px;
-    }
-
-    .titulo h2{
-        font-size:16px;
-    }
-
-    th,td{
-        font-size:12px;
+    body{
         padding:6px;
     }
 
-    .estado{
-        font-size:24px;
+    .cabecera{
+        padding:12px;
+        border-radius:12px;
     }
+
+    .card{
+        width:100%;
+        max-width:none;
+        padding:10px;
+        border-radius:12px;
+    }
+
+    .logo-renfe{
+        width:55px;
+    }
+
+    .titulo h1{
+        font-size:30px;
+    }
+
+    .titulo h2{
+        font-size:13px;
+        line-height:1.2;
+    }
+
+    .buscador{
+        padding:12px;
+    }
+
+    .buscador h3{
+        font-size:18px;
+    }
+
+    input,
+    select,
+    .btn{
+        font-size:14px;
+        padding:10px;
+    }
+
+    table{
+        font-size:11px;
+    }
+
+    th,
+    td{
+        padding:4px;
+    }
+
+    .estado{
+        font-size:22px;
+        padding:12px;
+    }
+
+    .obs{
+        font-size:13px;
+    }
+
 }
+
 </style>
 </head>
 
@@ -223,14 +280,11 @@ footer{
 <div class="card">
 
     <div class="buscador">
-
         <h3>Consulta por número de tren</h3>
-
         <input
             type="text"
             id="tren"
             placeholder="Introduzca número de tren">
-
     </div>
 
     <div id="resultado"></div>
@@ -271,31 +325,32 @@ Renfe · Información al viajero
 
 <script>
 
-let trenes=[];
+let trenes = [];
 
 fetch("datos.csv")
-.then(r=>r.text())
-.then(texto=>{
+.then(r => r.text())
+.then(texto => {
 
-    const lineas=texto.split(/\r?\n/);
+    const lineas = texto.split(/\r?\n/);
 
     for(let i=1;i<lineas.length;i++){
 
         if(!lineas[i].trim()) continue;
 
-        const c=lineas[i].split(";");
+        const c = lineas[i].split(";");
 
         trenes.push({
-            dia:c[0]||"",
-            tren:c[1]||"",
-            salida:c[2]||"",
-            llegada:c[3]||"",
-            recorrido:c[4]||"",
-            origen:c[5]||"",
-            destino:c[6]||"",
-            afectacion:c[7]||"",
-            observaciones:c[8]||""
+            dia: c[0] || "",
+            tren: c[1] || "",
+            salida: c[2] || "",
+            llegada: c[3] || "",
+            recorrido: c[4] || "",
+            origen: c[5] || "",
+            destino: c[6] || "",
+            afectacion: c[7] || "",
+            observaciones: c[8] || ""
         });
+
     }
 
     cargarOrigenes();
@@ -304,17 +359,53 @@ fetch("datos.csv")
 
 function cargarOrigenes(){
 
-    const origenes=[
+    const origenes = [
         ...new Set(
-            trenes.map(t=>t.origen).filter(Boolean)
+            trenes
+            .map(t => t.origen)
+            .filter(Boolean)
         )
     ].sort();
 
-    const select=document.getElementById("origenFiltro");
+    const select =
+    document.getElementById("origenFiltro");
 
-    origenes.forEach(o=>{
+    origenes.forEach(o => {
+
         select.innerHTML +=
         `<option value="${o}">${o}</option>`;
+
+    });
+
+}
+
+function ordenar(lista){
+
+    lista.sort((a,b)=>{
+
+        const fechaA =
+        new Date(a.dia.split("/").reverse().join("-"));
+
+        const fechaB =
+        new Date(b.dia.split("/").reverse().join("-"));
+
+        if(fechaA.getTime() !== fechaB.getTime()){
+            return fechaA - fechaB;
+        }
+
+        const hA = (a.salida || "0:00").split(":");
+        const hB = (b.salida || "0:00").split(":");
+
+        const minA =
+            parseInt(hA[0],10) * 60 +
+            parseInt(hA[1],10);
+
+        const minB =
+            parseInt(hB[0],10) * 60 +
+            parseInt(hB[1],10);
+
+        return minA - minB;
+
     });
 
 }
@@ -325,25 +416,25 @@ document
 
 function buscarTren(){
 
-    const numero=
+    const numero =
     document.getElementById("tren").value.trim();
 
-    const resultado=
+    const resultado =
     document.getElementById("resultado");
 
-    if(numero===""){
-        resultado.innerHTML="";
+    if(numero === ""){
+        resultado.innerHTML = "";
         return;
     }
 
-    const datos=
+    const datos =
     trenes.filter(
-        t=>t.tren.trim()===numero
+        t => t.tren.trim() === numero
     );
 
-    if(datos.length===0){
+    if(datos.length === 0){
 
-        resultado.innerHTML=
+        resultado.innerHTML =
         "<div class='ficha'>Tren no encontrado</div>";
 
         return;
@@ -351,14 +442,15 @@ function buscarTren(){
 
     ordenar(datos);
 
-    let html="";
+    let html = "";
 
-    datos.forEach(dato=>{
+    datos.forEach(dato => {
 
-        const circula=
+        const circula =
         dato.afectacion
-        .toUpperCase()
-        .includes("NO AFECTADO");
+            .trim()
+            .toUpperCase()
+            .includes("NO AFECTADO");
 
         html += `
 
@@ -367,6 +459,7 @@ function buscarTren(){
             <table>
 
                 <thead>
+
                     <tr>
                         <th>Día</th>
                         <th>Tren</th>
@@ -375,9 +468,11 @@ function buscarTren(){
                         <th>Llegada</th>
                         <th>Destino</th>
                     </tr>
+
                 </thead>
 
                 <tbody>
+
                     <tr>
                         <td>${dato.dia}</td>
                         <td>${dato.tren}</td>
@@ -386,18 +481,19 @@ function buscarTren(){
                         <td>${dato.llegada}</td>
                         <td>${dato.destino}</td>
                     </tr>
+
                 </tbody>
 
             </table>
 
-            <div class="estado ${circula ? 'verde':'rojo'}">
+            <div class="estado ${circula ? 'verde' : 'rojo'}">
                 ${circula ? '🟢 CIRCULA' : '🔴 NO CIRCULA'}
             </div>
 
             ${
                 circula &&
                 dato.observaciones &&
-                dato.observaciones.trim()!==""
+                dato.observaciones.trim() !== ""
                 ?
                 `<div class="obs">
                     <b>Observaciones</b><br><br>
@@ -410,127 +506,42 @@ function buscarTren(){
         `;
     });
 
-    resultado.innerHTML=html;
+    resultado.innerHTML = html;
+
 }
 
 function buscarOrigen(){
 
-    let resultados=[...trenes];
+    let resultados = [...trenes];
 
-    const origen=
+    const origen =
     document.getElementById("origenFiltro").value;
 
-    const estado=
+    const estado =
     document.getElementById("estadoFiltro").value;
 
     if(origen){
-        resultados=
-        resultados.filter(t=>t.origen===origen);
-    }
 
-    if(estado==="circula"){
-        resultados=
-        resultados.filter(
-            t=>t.afectacion
-            .toUpperCase()
-            .includes("NO AFECTADO")
+        resultados = resultados.filter(
+            t => t.origen === origen
         );
+
     }
 
-    if(estado==="nocircula"){
-        resultados=
-        resultados.filter(
-            t=>!t.afectacion
-            .toUpperCase()
-            .includes("NO AFECTADO")
+    if(estado === "circula"){
+
+        resultados = resultados.filter(
+            t => t.afectacion
+                    .toUpperCase()
+                    .includes("NO AFECTADO")
         );
+
     }
 
-    ordenar(resultados);
+    if(estado === "nocircula"){
 
-    let html=`
-    <div class="ficha">
-
-    <h3 style="margin-bottom:15px;">
-        ${resultados.length} tren(es) encontrados
-    </h3>
-
-    <table>
-        <thead>
-            <tr>
-                <th>Día</th>
-                <th>Tren</th>
-                <th>Salida</th>
-                <th>Origen</th>
-                <th>Llegada</th>
-                <th>Destino</th>
-                <th>Estado</th>
-            </tr>
-        </thead>
-        <tbody>
-    `;
-
-    resultados.forEach(t=>{
-
-        const circula=
-        t.afectacion
-        .toUpperCase()
-        .includes("NO AFECTADO");
-
-        html += `
-        <tr>
-            <td>${t.dia}</td>
-            <td>${t.tren}</td>
-            <td>${t.salida}</td>
-            <td>${t.origen}</td>
-            <td>${t.llegada}</td>
-            <td>${t.destino}</td>
-            <td>${circula ? '🟢 CIRCULA' : '🔴 NO CIRCULA'}</td>
-        </tr>
-        `;
-    });
-
-    html += `
-        </tbody>
-    </table>
-
-    </div>
-    `;
-
-    document.getElementById("tablaResultados")
-    .innerHTML=html;
-}
-
-function ordenar(lista){
-
-    lista.sort((a,b)=>{
-
-        const fechaA=
-        new Date(a.dia.split("/").reverse().join("-"));
-
-        const fechaB=
-        new Date(b.dia.split("/").reverse().join("-"));
-
-        if(fechaA.getTime()!==fechaB.getTime()){
-            return fechaA-fechaB;
-        }
-
-        const hA=(a.salida||"0:00").split(":");
-        const hB=(b.salida||"0:00").split(":");
-
-        const minA=
-            parseInt(hA[0])*60+
-            parseInt(hA[1]);
-
-        const minB=
-            parseInt(hB[0])*60+
-            parseInt(hB[1]);
-
-        return minA-minB;
-    });
-}
-
-</script>
-
-</body>
-</html>
+        resultados = resultados.filter(
+            t => !t.afectacion
+                    .toUpperCase()
+                    .includes("NO AFECTADO")
+       
