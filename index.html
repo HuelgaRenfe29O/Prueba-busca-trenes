@@ -330,68 +330,133 @@ function buscarTren(){
         return;
     }
 
-    const dato =
-    trenes.find(t => t.tren.trim() === numero);
+    const datos =
+    trenes.filter(
+        t => t.tren.trim() === numero
+    );
 
-    if(!dato){
+    if(datos.length === 0){
 
         resultado.innerHTML =
         "<div class='ficha'>Tren no encontrado</div>";
 
         return;
-
     }
 
-    const circula =
-    dato.afectacion.trim().toUpperCase() === "NO AFECTADO";
+    datos.sort((a, b) => {
 
-    resultado.innerHTML = `
+        const fechaA = new Date(
+            a.dia.split("/").reverse().join("-")
+        );
 
+        const fechaB = new Date(
+            b.dia.split("/").reverse().join("-")
+        );
+
+        if(fechaA.getTime() !== fechaB.getTime()){
+            return fechaA - fechaB;
+        }
+
+        const partesA =
+            (a.salida || "0:00").split(":");
+
+        const partesB =
+            (b.salida || "0:00").split(":");
+
+        const minutosA =
+            parseInt(partesA[0],10) * 60 +
+            parseInt(partesA[1],10);
+
+        const minutosB =
+            parseInt(partesB[0],10) * 60 +
+            parseInt(partesB[1],10);
+
+        return minutosA - minutosB;
+
+    });
+
+    let html = `
     <div class="ficha">
 
-    <table>
+        <table>
 
-        <thead>
-            <tr>
-                <th>Día</th>
-                <th>Tren</th>
-                <th>Salida</th>
-                <th>Origen</th>
-                <th>Llegada</th>
-                <th>Destino</th>
-            </tr>
-        </thead>
+            <thead>
+                <tr>
+                    <th>Día</th>
+                    <th>Tren</th>
+                    <th>Salida</th>
+                    <th>Origen</th>
+                    <th>Llegada</th>
+                    <th>Destino</th>
+                </tr>
+            </thead>
 
-        <tbody>
-            <tr>
-                <td>${dato.dia}</td>
-                <td>${dato.tren}</td>
-                <td>${dato.salida}</td>
-                <td>${dato.origen}</td>
-                <td>${dato.llegada}</td>
-                <td>${dato.destino}</td>
-            </tr>
-        </tbody>
-
-    </table>
-
-    <div class="estado ${circula ? 'verde' : 'rojo'}">
-        ${circula ? '🟢 CIRCULA' : '🔴 NO CIRCULA'}
-    </div>
-
-    ${
-        circula &&
-        dato.observaciones.trim() !== ""
-        ?
-        `<div class="obs">
-            <b>Observaciones</b><br><br>
-            ${dato.observaciones}
-        </div>`
-        : ""
-    }
-
-    </div>
+            <tbody>
     `;
+
+    datos.forEach(dato => {
+
+        html += `
+        <tr>
+            <td>${dato.dia}</td>
+            <td>${dato.tren}</td>
+            <td>${dato.salida}</td>
+            <td>${dato.origen}</td>
+            <td>${dato.llegada}</td>
+            <td>${dato.destino}</td>
+        </tr>
+        `;
+
+    });
+
+    html += `
+            </tbody>
+
+        </table>
+    `;
+
+    datos.forEach(dato => {
+
+        const circula =
+            dato.afectacion
+            .trim()
+            .toUpperCase()
+            .includes("NO AFECTADO");
+
+        html += `
+
+        <div class="estado ${circula ? 'verde' : 'rojo'}">
+
+            ${circula
+            ? '🟢 CIRCULA'
+            : '🔴 NO CIRCULA'}
+
+        </div>
+        `;
+
+        if(
+            circula &&
+            dato.observaciones &&
+            dato.observaciones.trim() !== ""
+        ){
+
+            html += `
+            <div class="obs">
+
+                <b>Observaciones</b><br><br>
+
+                ${dato.observaciones}
+
+            </div>
+            `;
+        }
+
+    });
+
+    html += `</div>`;
+
+    resultado.innerHTML = html;
+
 }
 
 function buscarOrigen(){
