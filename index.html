@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Consulta de Trenes</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background:#f4f4f4;
+    margin:0;
+    padding:20px;
+}
+
+.contenedor{
+    max-width:700px;
+    margin:auto;
+    background:#fff;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 2px 10px rgba(0,0,0,.15);
+}
+
+h1{
+    text-align:center;
+    color:#333;
+}
+
+input{
+    width:100%;
+    padding:12px;
+    font-size:18px;
+    border:1px solid #ccc;
+    border-radius:6px;
+    box-sizing:border-box;
+}
+
+.resultado{
+    margin-top:20px;
+}
+
+.campo{
+    margin:10px 0;
+    font-size:18px;
+}
+
+.estado{
+    margin-top:20px;
+    padding:15px;
+    border-radius:8px;
+    color:white;
+    text-align:center;
+    font-size:24px;
+    font-weight:bold;
+}
+
+.verde{
+    background:#16a34a;
+}
+
+.rojo{
+    background:#dc2626;
+}
+
+.obs{
+    margin-top:15px;
+    padding:12px;
+    background:#f7f7f7;
+    border-left:5px solid #0078d7;
+    border-radius:5px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="contenedor">
+
+<h1>Consulta de Trenes</h1>
+
+<input
+type="text"
+id="tren"
+placeholder="Introduzca número de tren">
+
+<div id="resultado" class="resultado"></div>
+
+</div>
+
+<script>
+
+let trenes = [];
+
+fetch("TRENES AFECTADOS MD HUELGA 29_10_26.csv")
+.then(response => response.text())
+.then(texto => {
+
+    const lineas = texto.split(/\r?\n/);
+
+    for(let i=1; i<lineas.length; i++){
+
+        if(!lineas[i].trim()) continue;
+
+        const c = lineas[i].split(";");
+
+        trenes.push({
+            dia: c[0] || "",
+            tren: c[1] || "",
+            salida: c[2] || "",
+            llegada: c[3] || "",
+            recorrido: c[4] || "",
+            origen: c[5] || "",
+            destino: c[6] || "",
+            afectacion: c[7] || "",
+            observaciones: c[8] || ""
+        });
+    }
+});
+
+document.getElementById("tren").addEventListener("input", buscar);
+
+function buscar(){
+
+    const numero = document.getElementById("tren").value.trim();
+
+    const resultado = document.getElementById("resultado");
+
+    if(numero === ""){
+        resultado.innerHTML = "";
+        return;
+    }
+
+    const dato = trenes.find(t => t.tren === numero);
+
+    if(!dato){
+        resultado.innerHTML = "<p>Tren no encontrado.</p>";
+        return;
+    }
+
+    const afectado =
+        dato.afectacion.toUpperCase().includes("AFECTADO") &&
+        !dato.afectacion.toUpperCase().includes("NO AFECTADO");
+
+    resultado.innerHTML = `
+        <div class="campo"><strong>Día:</strong> ${dato.dia}</div>
+        <div class="campo"><strong>Tren:</strong> ${dato.tren}</div>
+        <div class="campo"><strong>Origen:</strong> ${dato.origen}</div>
+        <div class="campo"><strong>Destino:</strong> ${dato.destino}</div>
+        <div class="campo"><strong>Hora salida:</strong> ${dato.salida}</div>
+        <div class="campo"><strong>Hora llegada:</strong> ${dato.llegada}</div>
+
+        <div class="estado ${afectado ? 'rojo' : 'verde'}">
+            ${afectado ? '🔴 NO CIRCULA' : '🟢 CIRCULA'}
+        </div>
+
+        ${dato.observaciones.trim() !== ''
+        ? `<div class="obs">
+            <strong>Observaciones:</strong><br>
+            ${dato.observaciones}
+           </div>`
+        : ''}
+    `;
+}
+
+</script>
+
+</body>
+</html>
