@@ -147,6 +147,10 @@ footer{
     .card{
         padding:20px;
     }
+
+    .estado{
+        font-size:28px;
+    }
 }
 
 </style>
@@ -184,7 +188,7 @@ Renfe · Consulta de afectaciones
 
 <script>
 
-let trenes=[];
+let trenes = [];
 
 fetch("datos.csv")
 .then(response => response.text())
@@ -192,53 +196,50 @@ fetch("datos.csv")
 
     const lineas = texto.split(/\r?\n/);
 
-    for(let i=1;i<lineas.length;i++){
+    for(let i = 1; i < lineas.length; i++){
 
         if(!lineas[i].trim()) continue;
 
         const c = lineas[i].split(";");
 
         trenes.push({
-            dia:c[0]||"",
-            tren:c[1]||"",
-            salida:c[2]||"",
-            llegada:c[3]||"",
-            recorrido:c[4]||"",
-            origen:c[5]||"",
-            destino:c[6]||"",
-            afectacion:c[7]||"",
-            observaciones:c[8]||""
+            dia: c[0] || "",
+            tren: c[1] || "",
+            salida: c[2] || "",
+            llegada: c[3] || "",
+            recorrido: c[4] || "",
+            origen: c[5] || "",
+            destino: c[6] || "",
+            afectacion: c[7] || "",
+            observaciones: c[8] || ""
         });
     }
 });
 
-document.getElementById("tren").addEventListener("input",buscar);
+document.getElementById("tren").addEventListener("input", buscar);
 
 function buscar(){
 
-    const numero =
-        document.getElementById("tren").value.trim();
+    const numero = document.getElementById("tren").value.trim();
+    const resultado = document.getElementById("resultado");
 
-    const resultado =
-        document.getElementById("resultado");
-
-    if(numero===""){
-        resultado.innerHTML="";
+    if(numero === ""){
+        resultado.innerHTML = "";
         return;
     }
 
-    const dato =
-        trenes.find(t => t.tren.trim() === numero);
+    const dato = trenes.find(
+        t => t.tren.trim() === numero
+    );
 
     if(!dato){
-        resultado.innerHTML=
+        resultado.innerHTML =
             "<div class='ficha'>Tren no encontrado.</div>";
         return;
     }
 
     const circula =
-        dato.afectacion.toUpperCase()
-        .includes("NO AFECTADO");
+        dato.afectacion.trim().toUpperCase() === "NO AFECTADO";
 
     resultado.innerHTML = `
     <div class="ficha">
@@ -255,12 +256,12 @@ function buscar(){
 
         <div class="campo"><b>Hora llegada:</b> ${dato.llegada}</div>
 
-        <div class="estado ${circula ? 'verde':'rojo'}">
+        <div class="estado ${circula ? 'verde' : 'rojo'}">
             ${circula ? '🟢 CIRCULA' : '🔴 NO CIRCULA'}
         </div>
 
         ${
-            dato.observaciones.trim() !== ""
+            circula && dato.observaciones.trim() !== ""
             ? `
             <div class="obs">
                 <b>Observaciones</b><br><br>
@@ -270,7 +271,8 @@ function buscar(){
             : ""
         }
 
-    </div>`;
+    </div>
+    `;
 }
 
 </script>
