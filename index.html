@@ -423,22 +423,34 @@ function buscarOrigen(){
         !== "NO AFECTADO");
     }
 
-    resultados.sort((a,b)=>{
+resultados.sort((a, b) => {
 
-        const fechaA =
-        new Date(a.dia.split("/").reverse().join("-"));
+    const fechaA = new Date(
+        a.dia.split("/").reverse().join("-")
+    );
 
-        const fechaB =
-        new Date(b.dia.split("/").reverse().join("-"));
+    const fechaB = new Date(
+        b.dia.split("/").reverse().join("-")
+    );
 
-        if(fechaA - fechaB !== 0){
-            return fechaA - fechaB;
-        }
+    if (fechaA.getTime() !== fechaB.getTime()) {
+        return fechaA - fechaB;
+    }
 
-        return (a.salida || "")
-        .localeCompare(b.salida || "");
+    const partesA = (a.salida || "0:00").split(":");
+    const partesB = (b.salida || "0:00").split(":");
 
-    });
+    const minutosA =
+        parseInt(partesA[0], 10) * 60 +
+        parseInt(partesA[1], 10);
+
+    const minutosB =
+        parseInt(partesB[0], 10) * 60 +
+        parseInt(partesB[1], 10);
+
+    return minutosA - minutosB;
+
+});
 
     let html = `
 
