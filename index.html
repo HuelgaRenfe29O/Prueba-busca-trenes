@@ -465,8 +465,8 @@ resultados.sort((a, b) => {
         <thead>
             <tr>
                 <th>Día</th>
-                <th>Salida</th>
                 <th>Tren</th>
+                <th>Salida</th>
                 <th>Origen</th>
                 <th>Llegada</th>
                 <th>Destino</th>
@@ -479,25 +479,25 @@ resultados.sort((a, b) => {
 
     resultados.forEach(t => {
 
-        const circula =
-        t.afectacion.trim().toUpperCase()
-        === "NO AFECTADO";
+    const circula =
+    t.afectacion.trim().toUpperCase()
+    === "NO AFECTADO";
 
-        html += `
-        <tr>
-            <td>${t.dia}</td>
-            <td>${t.salida}</td>
-            <td>${t.tren}</td>
-            <td>${t.origen}</td>
-            <td>${t.llegada}</td>
-            <td>${t.destino}</td>
-            <td>
-                ${circula
-                ? '🟢 CIRCULA'
-                : '🔴 NO CIRCULA'}
-            </td>
-        </tr>`;
-    });
+    html += `
+    <tr>
+        <td>${t.dia}</td>
+        <td>${t.tren}</td>
+        <td>${t.salida}</td>
+        <td>${t.origen}</td>
+        <td>${t.llegada}</td>
+        <td>${t.destino}</td>
+        <td>
+            ${circula
+            ? '🟢 CIRCULA'
+            : '🔴 NO CIRCULA'}
+        </td>
+    </tr>`;
+});
 
     html += `
         </tbody>
