@@ -21,7 +21,7 @@ body{
 
 .cabecera{
     max-width:1200px;
-    margin:0 auto 25px auto;
+    margin:0 auto 25px;
     background:linear-gradient(
         90deg,
         #7a0a60 0%,
@@ -43,8 +43,6 @@ body{
 
 .logo-renfe{
     width:90px;
-    height:auto;
-    flex-shrink:0;
 }
 
 .titulo h1{
@@ -55,10 +53,8 @@ body{
 
 .titulo h2{
     color:white;
-    font-size:22px;
     font-weight:300;
-    margin-top:6px;
-    line-height:1.2;
+    font-size:22px;
 }
 
 .card{
@@ -67,7 +63,6 @@ body{
     background:white;
     border-radius:20px;
     padding:30px;
-    box-shadow:0 10px 25px rgba(0,0,0,.20);
 }
 
 .buscador{
@@ -88,12 +83,11 @@ body{
     color:white;
     text-align:center;
     margin-bottom:15px;
-    font-size:28px;
 }
 
 input,select{
     width:100%;
-    padding:15px;
+    padding:14px;
     border:none;
     border-radius:10px;
     font-size:16px;
@@ -107,29 +101,28 @@ input,select{
 
 .btn{
     width:100%;
+    margin-top:15px;
     padding:15px;
     border:none;
     border-radius:10px;
     background:#c00060;
     color:white;
     font-size:16px;
-    font-weight:bold;
     cursor:pointer;
-    margin-top:15px;
 }
 
 .ficha{
-    background:#f8f8f8;
-    padding:25px;
+    background:#f7f7f7;
     border-radius:15px;
+    padding:20px;
 }
 
 .estado{
     margin-top:20px;
     text-align:center;
-    font-size:34px;
-    font-weight:bold;
     color:white;
+    font-size:32px;
+    font-weight:bold;
     padding:18px;
     border-radius:12px;
 }
@@ -147,20 +140,18 @@ input,select{
     background:white;
     border-left:5px solid #c00060;
     padding:15px;
-    border-radius:10px;
+    border-radius:8px;
 }
 
 table{
     width:100%;
     border-collapse:collapse;
-    margin-top:10px;
 }
 
 th{
     background:#c00060;
     color:white;
-    padding:12px;
-    text-align:center;
+    padding:10px;
 }
 
 td{
@@ -174,47 +165,33 @@ tr:hover{
 }
 
 footer{
-    text-align:center;
     color:white;
+    text-align:center;
     margin-top:20px;
-    font-size:13px;
-}
-
-.separador{
-    margin:35px 0;
 }
 
 @media(max-width:768px){
 
     .logo-renfe{
-        width:65px;
+        width:60px;
     }
 
     .titulo h1{
-        font-size:38px;
+        font-size:36px;
     }
 
     .titulo h2{
         font-size:16px;
     }
 
-    .card{
-        padding:20px;
-    }
-
     th,td{
         font-size:12px;
-        padding:6px;
-    }
-
-    .estado{
-        font-size:28px;
     }
 }
 
 </style>
-</head>
 
+</head>
 <body>
 
 <header class="cabecera">
@@ -237,8 +214,6 @@ footer{
 
 <div class="card">
 
-    <!-- BUSQUEDA POR TREN -->
-
     <div class="buscador">
 
         <h3>Consulta por número de tren</h3>
@@ -252,9 +227,7 @@ footer{
 
     <div id="resultado"></div>
 
-    <hr class="separador">
-
-    <!-- BUSQUEDA POR ORIGEN -->
+    <hr style="margin:40px 0;">
 
     <div class="buscador">
 
@@ -293,19 +266,18 @@ Renfe · Información al viajero
 let trenes=[];
 
 fetch("datos.csv")
-.then(r=>r.text())
-.then(texto=>{
+.then(r => r.text())
+.then(texto => {
 
-    const lineas=texto.split(/\r?\n/);
+    const lineas = texto.split(/\r?\n/);
 
     for(let i=1;i<lineas.length;i++){
 
         if(!lineas[i].trim()) continue;
 
-        const c=lineas[i].split(";");
+        const c = lineas[i].split(";");
 
         trenes.push({
-
             dia:c[0] || "",
             tren:c[1] || "",
             salida:c[2] || "",
@@ -315,7 +287,6 @@ fetch("datos.csv")
             destino:c[6] || "",
             afectacion:c[7] || "",
             observaciones:c[8] || ""
-
         });
 
     }
@@ -326,18 +297,14 @@ fetch("datos.csv")
 
 function cargarOrigenes(){
 
-    const origenes=[
-        ...new Set(
-            trenes
-            .map(t=>t.origen)
-            .filter(v=>v)
-        )
-    ].sort();
+    const origenes =
+    [...new Set(trenes.map(t => t.origen).filter(Boolean))]
+    .sort();
 
-    const select=
-        document.getElementById("origenFiltro");
+    const select =
+    document.getElementById("origenFiltro");
 
-    origenes.forEach(o=>{
+    origenes.forEach(o => {
 
         select.innerHTML +=
         `<option value="${o}">${o}</option>`;
@@ -346,205 +313,189 @@ function cargarOrigenes(){
 
 }
 
-document.getElementById("tren")
-.addEventListener("input",buscarTren);
+document
+.getElementById("tren")
+.addEventListener("input", buscarTren);
 
 function buscarTren(){
 
-    const numero=
-        document.getElementById("tren")
-        .value
-        .trim();
+    const numero =
+    document.getElementById("tren").value.trim();
 
-    const resultado=
-        document.getElementById("resultado");
+    const resultado =
+    document.getElementById("resultado");
 
-    if(numero===""){
-
-        resultado.innerHTML="";
+    if(numero === ""){
+        resultado.innerHTML = "";
         return;
-
     }
 
-    const dato=
-        trenes.find(
-            t => t.tren.trim() === numero
-        );
+    const dato =
+    trenes.find(t => t.tren.trim() === numero);
 
     if(!dato){
 
-        resultado.innerHTML=
-        "<div class='ficha'>Tren no encontrado.</div>";
+        resultado.innerHTML =
+        "<div class='ficha'>Tren no encontrado</div>";
 
         return;
+
     }
 
-    const circula=
-        dato.afectacion
-        .trim()
-        .toUpperCase()==="NO AFECTADO";
+    const circula =
+    dato.afectacion.trim().toUpperCase() === "NO AFECTADO";
 
-    resultado.innerHTML=`
+    resultado.innerHTML = `
 
     <div class="ficha">
 
-        <table>
+    <table>
 
-            <thead>
-                <tr>
-                    <th>Día</th>
-                    <th>Tren</th>
-                    <th>Salida</th>
-                    <th>Origen</th>
-                    <th>Llegada</th>
-                    <th>Destino</th>
-                </tr>
-            </thead>
+        <thead>
+            <tr>
+                <th>Día</th>
+                <th>Tren</th>
+                <th>Salida</th>
+                <th>Origen</th>
+                <th>Llegada</th>
+                <th>Destino</th>
+            </tr>
+        </thead>
 
-            <tbody>
-                <tr>
-                    <td>${dato.dia}</td>
-                    <td>${dato.tren}</td>
-                    <td>${dato.salida}</td>
-                    <td>${dato.origen}</td>
-                    <td>${dato.llegada}</td>
-                    <td>${dato.destino}</td>
-                </tr>
-            </tbody>
+        <tbody>
+            <tr>
+                <td>${dato.dia}</td>
+                <td>${dato.tren}</td>
+                <td>${dato.salida}</td>
+                <td>${dato.origen}</td>
+                <td>${dato.llegada}</td>
+                <td>${dato.destino}</td>
+            </tr>
+        </tbody>
 
-        </table>
+    </table>
 
-        <div class="estado ${circula ? 'verde' : 'rojo'}">
-            ${circula ? '🟢 CIRCULA' : '🔴 NO CIRCULA'}
-        </div>
-
-        ${
-            circula &&
-            dato.observaciones.trim() !== ""
-            ?
-            `
-            <div class="obs">
-                <b>Observaciones</b><br><br>
-                ${dato.observaciones}
-            </div>
-            `
-            : ""
-        }
-
+    <div class="estado ${circula ? 'verde' : 'rojo'}">
+        ${circula ? '🟢 CIRCULA' : '🔴 NO CIRCULA'}
     </div>
 
-    `;
+    ${
+        circula &&
+        dato.observaciones.trim() !== ""
+        ?
+        `<div class="obs">
+            <b>Observaciones</b><br><br>
+            ${dato.observaciones}
+        </div>`
+        : ""
+    }
 
+    </div>
+    `;
 }
 
 function buscarOrigen(){
 
-    const origen=
-        document.getElementById("origenFiltro").value;
+    const origen =
+    document.getElementById("origenFiltro").value;
 
-    const estado=
-        document.getElementById("estadoFiltro").value;
+    const estado =
+    document.getElementById("estadoFiltro").value;
 
-    let resultados=[...trenes];
+    let resultados = [...trenes];
 
     if(origen){
-
-        resultados=resultados.filter(
-            t => t.origen === origen
-        );
-
+        resultados =
+        resultados.filter(t => t.origen === origen);
     }
 
-    if(estado==="circula"){
-
-        resultados=resultados.filter(
-            t =>
-            t.afectacion.trim().toUpperCase()
-            === "NO AFECTADO"
-        );
-
+    if(estado === "circula"){
+        resultados =
+        resultados.filter(
+        t => t.afectacion.trim().toUpperCase()
+        === "NO AFECTADO");
     }
 
-    if(estado==="nocircula"){
-
-        resultados=resultados.filter(
-            t =>
-            t.afectacion.trim().toUpperCase()
-            !== "NO AFECTADO"
-        );
-
+    if(estado === "nocircula"){
+        resultados =
+        resultados.filter(
+        t => t.afectacion.trim().toUpperCase()
+        !== "NO AFECTADO");
     }
 
-    let html=`
+    resultados.sort((a,b)=>{
+
+        const fechaA =
+        new Date(a.dia.split("/").reverse().join("-"));
+
+        const fechaB =
+        new Date(b.dia.split("/").reverse().join("-"));
+
+        if(fechaA - fechaB !== 0){
+            return fechaA - fechaB;
+        }
+
+        return (a.salida || "")
+        .localeCompare(b.salida || "");
+
+    });
+
+    let html = `
 
     <div class="ficha">
 
-        <h3>
-            ${resultados.length}
-            tren(es) encontrados
-        </h3>
+    <h3 style="margin-bottom:15px;">
+        ${resultados.length} tren(es) encontrados
+    </h3>
 
-        <table>
+    <table>
 
-            <thead>
+        <thead>
+            <tr>
+                <th>Día</th>
+                <th>Salida</th>
+                <th>Tren</th>
+                <th>Origen</th>
+                <th>Llegada</th>
+                <th>Destino</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
 
-                <tr>
-                    <th>Día</th>
-                    <th>Tren</th>
-                    <th>Salida</th>
-                    <th>Origen</th>
-                    <th>Llegada</th>
-                    <th>Destino</th>
-                    <th>Estado</th>
-                </tr>
-
-            </thead>
-
-            <tbody>
-
+        <tbody>
     `;
 
-    resultados.forEach(t=>{
+    resultados.forEach(t => {
 
-        const circula=
-            t.afectacion.trim().toUpperCase()
-            === "NO AFECTADO";
+        const circula =
+        t.afectacion.trim().toUpperCase()
+        === "NO AFECTADO";
 
-        html+=`
-
+        html += `
         <tr>
-
             <td>${t.dia}</td>
-            <td>${t.tren}</td>
             <td>${t.salida}</td>
+            <td>${t.tren}</td>
             <td>${t.origen}</td>
             <td>${t.llegada}</td>
             <td>${t.destino}</td>
-
             <td>
                 ${circula
                 ? '🟢 CIRCULA'
                 : '🔴 NO CIRCULA'}
             </td>
-
-        </tr>
-
-        `;
+        </tr>`;
     });
 
-    html+=`
+    html += `
+        </tbody>
+    </table>
 
-            </tbody>
+    </div>`;
 
-        </table>
-
-    </div>
-
-    `;
-
-    document.getElementById("tablaResultados")
-    .innerHTML=html;
-
+    document
+    .getElementById("tablaResultados")
+    .innerHTML = html;
 }
 
 </script>
